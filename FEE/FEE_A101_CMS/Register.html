@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <title>Register</title>
+</head>
+
+<body>
+    <div class="container mt-5 d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="card" style="width: 400px">
+            <div class="card-header ">
+                <span class="text-left w-100">Register</span>
+
+            </div>
+            <div class="card-body p-4">
+                <form id="registerForm" onsubmit="return handleRegister(event)">
+                    <div class="form-group">
+                        <input id="usernameInput" type="text" class="form-control" maxlength="50"
+                            placeholder="Username">
+                        <div class="invalid-feedback" id="usernameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <input id="emailInput" type="email" class="form-control" maxlength="50" placeholder="E-mail">
+                        <div class="invalid-feedback" id="emailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <input id="passwordInput" type="password" class="form-control" maxlength="50"
+                            placeholder="Password">
+                        <div class="invalid-feedback" id="passwordError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <input id="rePasswordInput" type="password" class="form-control" maxlength="50"
+                            placeholder="Re-enter Password">
+                        <div class="invalid-feedback" id="rePasswordError"></div>
+                    </div>
+
+
+
+                    <button type="submit" class="mb-2 btn btn-success btn-block">Register</button>
+                    <a href="Login.html" class="text-decoration-none">Click here to login</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        const handleRegister = (event) => {
+            event.preventDefault();
+
+            const username = document.getElementById('usernameInput');
+            const email = document.getElementById('emailInput');
+            const password = document.getElementById('passwordInput');
+            const rePassword = document.getElementById('rePasswordInput');
+
+            const isValid = validateForm();
+
+            if (isValid) {
+                const userData = {
+                    username: username.value.trim(),
+                    email: email.value.trim(),
+                    password: password.value.trim(),
+                    firstName: null,
+                    lastName: null,
+                    phone: null,
+                    description: null
+                };
+
+                localStorage.setItem('userProfile', JSON.stringify(userData));
+
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                users.push(userData);
+                localStorage.setItem('users', JSON.stringify(users));
+
+                alert('Registration successful!');
+                window.location.href = 'Login.html';
+            }
+
+            return false;
+        };
+
+        function validateForm() {
+            const username = document.getElementById('usernameInput');
+            const email = document.getElementById('emailInput');
+            const password = document.getElementById('passwordInput');
+            const rePassword = document.getElementById('rePasswordInput');
+
+            const usernameError = document.getElementById('usernameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const rePasswordError = document.getElementById('rePasswordError');
+
+            let valid = true;
+
+            [username, email, password, rePassword].forEach(el => {
+                el.classList.remove('is-invalid');
+            });
+
+            const userVal = username.value.trim();
+            if (userVal === "") {
+                usernameError.textContent = "Username is required";
+                username.classList.add('is-invalid');
+                valid = false;
+            } else if (userVal.length < 3 || userVal.length > 30) {
+                usernameError.textContent = "Username must be between 3 and 30 characters";
+                username.classList.add('is-invalid');
+                valid = false;
+            }
+
+            const emailVal = email.value.trim();
+            if (emailVal === "") {
+                emailError.textContent = "Email is required";
+                email.classList.add('is-invalid');
+                valid = false;
+            } else if (emailVal.length < 5) {
+                emailError.textContent = "Email must be at least 5 characters";
+                email.classList.add('is-invalid');
+                valid = false;
+            }
+
+            const passVal = password.value.trim();
+            if (passVal === "") {
+                passwordError.textContent = "Password is required";
+                password.classList.add('is-invalid');
+                valid = false;
+            } else if (passVal.length < 8 || passVal.length > 30) {
+                passwordError.textContent = "Password must be between 8 and 30 characters";
+                password.classList.add('is-invalid');
+                valid = false;
+            }
+
+            const rePassVal = rePassword.value.trim();
+            if (rePassVal === "") {
+                rePasswordError.textContent = "Re-enter password is required";
+                rePassword.classList.add('is-invalid');
+                valid = false;
+            } else if (rePassVal !== passVal) {
+                rePasswordError.textContent = "Passwords do not match";
+                rePassword.classList.add('is-invalid');
+                valid = false;
+            }
+
+            if (!valid) {
+                const firstError = document.querySelector('.is-invalid');
+                if (firstError) firstError.focus();
+            }
+
+            return valid;
+        }
+    </script>
+</body>
+
+</html>

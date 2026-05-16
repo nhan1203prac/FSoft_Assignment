@@ -1,0 +1,15 @@
+.active-sidebar {
+  background: rgba(128, 128, 128, 0.087);
+}
+.right-content {
+  position: relative;
+  min-height: 600px;
+}
+#loader {
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 100;
+}
+
+.form-group label{
+    font-weight: 600;
+}

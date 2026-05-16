@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Đăng ký - LinguaVault</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+
+    <style>
+        .section-header {
+            padding: .5rem 1rem;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">LinguaVault</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/registrations/new}">Đăng ký mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/registrations}">Danh sách</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h3>Tạo Đăng ký Gói học</h3>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Thông tin chi tiết bản ghi
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/registrations/save}" th:object="${registration}" method="post" id="regForm" novalidate>
+
+                <div class="section-header">1. Thông tin khách hàng</div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="fullName">Họ và tên *</label>
+                        <input type="text" class="form-control" id="fullName" th:field="*{fullName}"
+                               th:classappend="${#fields.hasErrors('fullName')} ? ' is-invalid'" required/>
+                        <div class="invalid-feedback">Vui lòng nhập họ tên.</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label" for="countryID">Quốc gia *</label>
+                        <select class="form-select" id="countryID" th:field="*{countryID}" required>
+                            <option value="">— Chọn —</option>
+                            <option th:each="c : ${countries}" th:value="${c.countryID}" th:text="${c.countryName}"></option>
+                        </select>
+                        <div class="invalid-feedback">Vui lòng chọn quốc gia.</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label" for="phoneNumber">Số điện thoại</label>
+                        <input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}"/>
+                    </div>
+                </div>
+
+                <div class="section-header">2. Thông tin gói học</div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label" for="packageID">Gói học *</label>
+                        <select class="form-select" id="packageID" th:field="*{packageID}" required>
+                            <option value="">— Chọn —</option>
+                            <option th:each="p : ${packages}" th:value="${p.packageID}"
+                                    th:text="${p.packageID + ' (' + p.duration + ')'}" th:attr="data-cost=${p.costOfLessons}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label" for="numLessons">Số buổi học *</label>
+                        <input type="number" class="form-control" id="numLessons" th:field="*{numLessons}" required/>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label" for="registrationDate">Ngày đăng ký</label>
+                        <input type="date" class="form-control bg-light" id="registrationDate" th:field="*{registrationDate}" readonly/>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label" for="effectiveDate">Ngày bắt đầu *</label>
+                        <input type="date" class="form-control" id="effectiveDate" th:field="*{effectiveDate}" required/>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label" for="expirationDate">Ngày kết thúc *</label>
+                        <input type="date" class="form-control" id="expirationDate" th:field="*{expirationDate}" required/>
+                    </div>
+                </div>
+
+                <div class="section-header">3. Thanh toán</div>
+                <div class="row mb-4">
+                    <div class="col-md-7">
+                        <div class="p-3 border bg-white">
+                            <label class="text-muted small">Tổng tiền thanh toán</label>
+                            <h2 class="text-primary fw-bold" id="totalDisplay">$0.00</h2>
+                            <p class="mb-0 small text-secondary" id="breakdownText">Thông tin tính toán tự động</p>
+                        </div>
+                        <input type="hidden" id="totalAmount" th:field="*{totalAmount}"/>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold small">Chiết khấu áp dụng</label>
+                        <div class="list-group">
+                            <div id="badgeVN" class="list-group-item list-group-item-light small py-2">Giảm 5% (Quốc tịch Việt Nam)</div>
+                            <div id="badge30" class="list-group-item list-group-item-light small py-2">Giảm 10% (Gói trên 30 buổi)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                    <a th:href="@{/registrations}" class="btn btn-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary px-4">Lưu lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rdField = document.getElementById('registrationDate');
+        if (rdField && !rdField.value) {
+            rdField.value = new Date().toISOString().split('T')[0];
+        }
+        calculateTotal();
+    });
+
+    function calculateTotal() {
+        const pkgSelect = document.getElementById('packageID');
+        const numLessons = parseInt(document.getElementById('numLessons').value) || 0;
+        const countryID = document.getElementById('countryID').value;
+        const selectedOpt = pkgSelect.options[pkgSelect.selectedIndex];
+        const costPerLesson = parseFloat(selectedOpt?.dataset?.cost) || 0;
+
+        if (!costPerLesson || numLessons <= 0) {
+            document.getElementById('totalDisplay').textContent = '$0.00';
+            document.getElementById('breakdownText').textContent = 'Vui lòng chọn đầy đủ thông tin';
+            document.getElementById('totalAmount').value = '';
+            updateBadge('badgeVN', false);
+            updateBadge('badge30', false);
+            return;
+        }
+
+        let base = numLessons * costPerLesson;
+        let breakdown = `${numLessons} buổi × $${costPerLesson.toFixed(2)}`;
+
+        let disc30 = false;
+        if (numLessons > 30) {
+            const extra = numLessons - 30;
+            base = base - (extra * costPerLesson * 0.10);
+            breakdown += ` (Giảm 10% cho ${extra} buổi vượt)`;
+            disc30 = true;
+        }
+
+        let discVN = false;
+        if (countryID === 'VN') {
+            base = base * 0.95;
+            breakdown += ' → Giảm 5% khách VN';
+            discVN = true;
+        }
+
+        document.getElementById('totalDisplay').textContent = '$' + base.toFixed(2);
+        document.getElementById('breakdownText').textContent = breakdown;
+        document.getElementById('totalAmount').value = base.toFixed(2);
+
+        updateBadge('badgeVN', discVN);
+        updateBadge('badge30', disc30);
+    }
+
+    function updateBadge(id, active) {
+        const el = document.getElementById(id);
+        if (active) {
+            el.classList.remove('list-group-item-light');
+            el.classList.add('list-group-item-success');
+        } else {
+            el.classList.remove('list-group-item-success');
+            el.classList.add('list-group-item-light');
+        }
+    }
+
+    document.getElementById('packageID').addEventListener('change', calculateTotal);
+    document.getElementById('numLessons').addEventListener('input', calculateTotal);
+    document.getElementById('countryID').addEventListener('change', calculateTotal);
+
+    document.getElementById('regForm').addEventListener('submit', function (e) {
+        let valid = true;
+        const numField = document.getElementById('numLessons');
+        const num = parseInt(numField.value);
+        if (!num || num <= 0) {
+            numField.classList.add('is-invalid');
+            valid = false;
+        } else {
+            numField.classList.remove('is-invalid');
+        }
+
+        const effVal = document.getElementById('effectiveDate').value;
+        const expVal = document.getElementById('expirationDate').value;
+        if (effVal && expVal && effVal >= expVal) {
+            document.getElementById('effectiveDate').classList.add('is-invalid');
+            valid = false;
+        } else {
+            document.getElementById('effectiveDate').classList.remove('is-invalid');
+        }
+
+        if (!valid) e.preventDefault();
+    });
+</script>
+</body>
+</html>

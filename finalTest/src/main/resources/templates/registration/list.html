@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Quản lý Đăng ký - LinguaVault</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .btn, .form-control, .form-select, .card {
+            border-radius: 2px;
+        }
+        .table {
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">LinguaVault</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/registrations/new}">Đăng ký mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/registrations}">Danh sách</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <div>
+            <h3 class="fw-bold mb-0">Quản lý Đăng ký</h3>
+            <p class="text-muted small mb-0">Tổng số bản ghi: <span th:text="${#lists.size(registrations)}">0</span></p>
+        </div>
+        <a th:href="@{/registrations/new}" class="btn btn-primary">
+            <i class="fa-solid fa-plus small"></i> Thêm mới
+        </a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body bg-white">
+            <form th:action="@{/registrations}" method="get" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <label class="visually-hidden">Tên khách hàng</label>
+                    <input type="text" class="form-control" name="searchName"
+                           th:value="${searchName}" placeholder="Tìm theo tên..."/>
+                </div>
+                <div class="col-md-4">
+                    <label class="visually-hidden">Quốc gia</label>
+                    <select class="form-select" name="searchCountry">
+                        <option value="">-- Tất cả quốc gia --</option>
+                        <option th:each="c : ${countries}"
+                                th:value="${c.countryID}"
+                                th:text="${c.countryName}"
+                                th:selected="${searchCountry == c.countryID}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-secondary w-100">Lọc dữ liệu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover bg-white">
+            <thead class="table-light">
+            <tr>
+                <th class="text-center">STT</th>
+                <th>Mã số</th>
+                <th>Họ tên / SĐT</th>
+                <th>Quốc gia</th>
+                <th>Gói học</th>
+                <th class="text-center">Số buổi</th>
+                <th>Bắt đầu</th>
+                <th>Hết hạn</th>
+                <th class="text-end">Thành tiền</th>
+                <th class="text-center">Sửa</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(registrations)}">
+                <td colspan="10" class="text-center py-4 text-muted">Không có dữ liệu phù hợp.</td>
+            </tr>
+
+            <tr th:each="r, stat : ${registrations}">
+                <td class="text-center" th:text="${stat.index + 1}">1</td>
+                <td class="fw-bold" th:text="${r.registrationID}">DK001</td>
+                <td>
+                    <div th:text="${r.fullName}">Nguyễn Văn A</div>
+                    <small class="text-muted" th:text="${r.phoneNumber}"></small>
+                </td>
+                <td th:text="${r.country != null ? r.country.countryName : '-'}">Vietnam</td>
+                <td>
+                    <span th:text="${r.lessonPackage != null ? r.lessonPackage.packageID : '-'}"></span>
+                    <br/><small class="text-muted" th:text="${r.lessonPackage != null ? r.lessonPackage.duration : ''}"></small>
+                </td>
+                <td class="text-center" th:text="${r.numLessons}">20</td>
+                <td th:text="${r.effectiveDate != null ? #temporals.format(r.effectiveDate,'dd/MM/yyyy') : '-'}"></td>
+                <td th:text="${r.expirationDate != null ? #temporals.format(r.expirationDate,'dd/MM/yyyy') : '-'}"></td>
+                <td class="text-end fw-bold">
+                    <span th:text="${r.totalAmount != null ? '$' + #numbers.formatDecimal(r.totalAmount,1,2) : '-'}"></span>
+                </td>
+                <td class="text-center">
+                    <a th:href="@{/registrations/edit/{id}(id=${r.registrationID})}"
+                       class="btn btn-outline-primary btn-sm">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-2 px-1" th:if="${!#lists.isEmpty(registrations)}">
+        <div class="text-muted small">
+            Hiển thị <span th:text="${#lists.size(registrations)}"></span> bản ghi.
+        </div>
+        <div class="h5 mb-0">
+            Tổng cộng: <span class="text-danger fw-bold"
+                             th:text="${#numbers.formatDecimal((grandTotal != null ? grandTotal : 0), 1, 2)}">0.00</span> $
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

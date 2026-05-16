@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+<head>
+    <title th:text="${mode == 'create' ? 'Thêm dịch vụ mới' : 'Cập nhật dịch vụ'}"></title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/services" class="text-decoration-none">Quản lý dịch vụ</a></li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${mode == 'create' ? 'Thêm mới' : 'Chỉnh sửa'}"></li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold text-dark" th:text="${mode == 'create' ? 'THÊM DỊCH VỤ MỚI' : 'CẬP NHẬT DỊCH VỤ'}"></h3>
+    </div>
+
+    <div id="jsErrorBlock" class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-3 d-none" role="alert">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
+        <span id="jsErrorMsg">Lỗi nhập liệu...</span>
+        <button type="button" class="btn-close" onclick="document.getElementById('jsErrorBlock').classList.add('d-none')"></button>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form onsubmit="return validate()" th:action="@{/services/save}" th:object="${dichVu}" method="post">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Mã Dịch Vụ <span class="text-danger">*</span></label>
+                        <input id="inputMaDV" type="text" th:field="*{maDV}" class="form-control"
+                               placeholder="Ví dụ: DV001"
+                               th:readonly="${mode == 'edit'}">
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('maDV')}" th:errors="*{maDV}"></div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Tên Dịch Vụ <span class="text-danger">*</span></label>
+                        <input type="text" th:field="*{tenDV}" class="form-control"
+                               placeholder="Nhập tên dịch vụ...">
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('tenDV')}" th:errors="*{tenDV}"></div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Đơn Vị Tính <span class="text-danger">*</span></label>
+                        <input type="text" th:field="*{donViTinh}" class="form-control"
+                               placeholder="Ví dụ: Chai, Lon, Cái, Giờ...">
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('donViTinh')}" th:errors="*{donViTinh}"></div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Đơn Giá <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="number" th:field="*{donGia}" class="form-control"
+                                   placeholder="0">
+                            <span class="input-group-text">VNĐ</span>
+                        </div>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('donGia')}" th:errors="*{donGia}"></div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/services" class="btn btn-light px-4 border">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fa-solid fa-save me-2"></i>Lưu thông tin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script layout:fragment="scripts">
+    function validate() {
+        const maDV = document.getElementById("inputMaDV").value.trim();
+        const errorBlock = document.getElementById("jsErrorBlock");
+        const errorMsg = document.getElementById("jsErrorMsg");
+
+        const maDVRegex = /^DV\d{3}$/;
+
+        if (!maDVRegex.test(maDV)) {
+            errorMsg.innerText = "Mã dịch vụ không hợp lệ! Phải đúng định dạng DVxxx (Ví dụ: DV001, DV012).";
+            errorBlock.classList.remove("d-none");
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            return false;
+        }
+
+        errorBlock.classList.add("d-none");
+        return true;
+    }
+</script>
+
+</body>
+</html>

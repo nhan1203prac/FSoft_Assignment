@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>create</title>
+</head>
+
+<body>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-4 w-80">
+
+                <div class="modal-body">
+                    <form id="loginForm" class="mb-5">
+                        <div class="form-group">
+                            <label for="loginEmail" class="font-weight-bold">Alias:</label>
+                            <input type="email" class="form-control" id="loginEmail" placeholder="email@example.com"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword" class="font-weight-bold">Password:</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password"
+                                required>
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label font-weight-bold" for="rememberMe">Remember me</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">Sign in</button>
+                    </form>
+                    <hr>
+                </div>
+                <div class="modal-footer border-0 justify-content-center mt-2">
+                    <button class="btn btn-light pl-3 pr-3 pt-1 pb-1  border-black" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container align-items-center">
+            <a class="navbar-brand brand" href="./index.html">Polls</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto nav-text">
+                    <li class="nav-item ">
+                        <a class="nav-link" href="./index.html">Vote <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="./Create.html">Create</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./List.html">List</a>
+                    </li>
+
+                </ul>
+                <button id="auth-btn" class="btn btn-login my-2 my-sm-0 " data-toggle="modal"
+                data-target="#loginModal">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1>Create interview</h1>
+        <div class="list-question">
+            <div class="row mb-4 mt-5">
+                <div class="col-3"></div>
+                <div class="col-8">
+                    <input type="text" placeholder="Name poll" name="name-poll" class="input-field"
+                        id="poll-name-input">
+                    <div class="text-danger error-name"></div>
+                </div>
+
+            </div>
+            <hr>
+            <div id="question-wrapper">
+                <div class="question-block">
+                    <div class="row mt-4 mb-4">
+                        <div class="col-3"></div>
+                        <div class="col-8">
+                            <input type="text" placeholder="Enter your question" name="question"
+                                class="question-input input-field" id="question-input">
+                            <div class="text-danger error-question"></div>
+                            <div class="mt-4">
+                                <input type="checkbox" name="mandatory" id="mandatory" class="mandatory mr-2">
+                                <label for="mandatory">Mandatory</label>
+                            </div>
+                            <div class="mt-4">
+                                <input type="checkbox" name="mul-select" id="mul-select" class="mul-select mr-2">
+                                <label for="mul-select">You can select multiple options</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row mt-4 mb-4">
+                        <div class="col-3 text-right ">Possible answers</div>
+                        <div class="col-8">
+                            <div id="answers-container">
+                                <div class="input-group">
+                                    <input type="text" class="input-field w-50 answer-item"
+                                        placeholder="Type your answer" name="answer" id="answer-input">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success add-answer-btn h-100 " type="button"
+                                            id="add-answer">+</button>
+                                    </div>
+                                    <div class="text-danger error-answer"></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <button class="btn btn-success" id="add-question">+ Add question</button>
+
+        <div class="btn-wrap">
+            <button class="btn btn-success btn-retain mb-3">Retain</button>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        const ADMIN_ACCOUNT = {
+            email: "admin@gmail.com",
+            password: "123456"
+        };
+        const questionWrapper = document.getElementById("question-wrapper");
+        const addQuestionBtn = document.getElementById("add-question");
+
+        addQuestionBtn.addEventListener("click", () => {
+            const newQuestion = document.createElement("div");
+            newQuestion.className = "question-block";
+
+            newQuestion.innerHTML = `
+        <div class="row mt-4 mb-4">
+            <div class="col-3"></div>
+            <div class="col-8">
+                <input type="text" placeholder="Enter your question" class="input-field question-input">
+                <div class="text-danger error-question"></div> 
+                <div class="mt-4">
+                    <input type="checkbox" class="mandatory mr-2">
+                    <label>Mandatory</label>
+                </div>
+
+                <div class="mt-4">
+                    <input type="checkbox" class="mul-select mr-2">
+                    <label>You can select multiple options</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 mb-4">
+            <div class="col-3 text-right">Possible answers</div>
+            <div class="col-8">
+                <div id="answers-container">
+                    <div class="input-group">
+                        <input type="text" class="input-field w-50 answer-item" placeholder="Type your answer">
+                        <div class="input-group-append">
+                            <button class="btn btn-success add-answer-btn h-100" type="button">+</button>
+                        </div>
+                    <div class="text-danger error-answer"></div> 
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+            questionWrapper.appendChild(newQuestion);
+        });
+
+        questionWrapper.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-answer-btn')) {
+                e.preventDefault();
+
+                const currentAnswersContainer = e.target.closest('#answers-container');
+
+                if (currentAnswersContainer) {
+                    const newGroup = document.createElement('div');
+                    newGroup.className = 'input-group mb-2';
+                    newGroup.innerHTML = `
+                <input type="text" class="input-field w-50 answer-item" placeholder="Type your answer">
+                <div class="input-group-append">
+                    <button class="btn btn-success add-answer-btn" type="button">+</button>
+                </div>
+            `;
+                    currentAnswersContainer.appendChild(newGroup);
+                }
+            }
+        });
+
+
+        // reatain button
+        const btn_retain = document.querySelector(".btn-retain");
+
+        btn_retain.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            document.querySelectorAll(".text-danger").forEach(el => el.innerText = "");
+
+            const validate = (value, label, min, max) => {
+                if (!value) return `${label} is required`;
+                if (value.length < min || value.length > max) {
+                    return `${label} must be between ${min} and ${max} chars`;
+                }
+                return null;
+            };
+
+            const namePoll = document.getElementById("poll-name-input").value.trim();
+            const questionBlocks = document.querySelectorAll(".question-block");
+            const questions = [];
+
+            const errName = validate(namePoll, "Name Poll", 3, 255);
+            if (errName) {
+                document.querySelector(".error-name").innerText = errName;
+            }
+
+            questionBlocks.forEach((block, index) => {
+                const question = block.querySelector(".question-input")?.value.trim();
+                const isMandatory = block.querySelector(".mandatory")?.checked;
+                const isMultiple = block.querySelector(".mul-select")?.checked;
+
+                const errQues = validate(question, "Question", 3, 255);
+                if (errQues) {
+                    block.querySelector(".error-question").innerText = errQues;
+                }
+
+                const answerInputs = block.querySelectorAll(".answer-item");
+                const filledAnswers = [];
+
+                answerInputs.forEach((input, aIdx) => {
+                    const val = input.value.trim();
+                    if (val !== "") {
+                        const err = validate(val, `Answer ${aIdx + 1}`, 3, 200);
+                        if (err) {
+                            block.querySelector(".error-answer").innerText = err;
+                        } else {
+                            filledAnswers.push(val);
+                        }
+                    }
+                });
+
+                if (block.querySelector(".error-answer").innerText === "" && filledAnswers.length === 0) {
+                    block.querySelector(".error-answer").innerText = `Question ${index + 1}: At least one answer is required`;
+                }
+
+                questions.push({
+                    question,
+                    answers: filledAnswers,
+                    mandatory: isMandatory,
+                    multiple: isMultiple
+                });
+            });
+
+
+            let hasAnyErrorText = false;
+            document.querySelectorAll(".text-danger").forEach(el => {
+                if (el.innerText.trim() !== "") {
+                    hasAnyErrorText = true;
+                }
+            });
+
+            if (hasAnyErrorText) {
+                console.log("Error!");
+                return;
+            }
+
+            const newPoll = {
+                id: crypto.randomUUID(),
+                name: namePoll,
+                questions: questions,
+                createdAt: new Date().toISOString()
+            };
+
+            const existingPolls = JSON.parse(localStorage.getItem('polls')) || [];
+            existingPolls.push(newPoll);
+            localStorage.setItem('polls', JSON.stringify(existingPolls));
+
+            alert("Save successfully!");
+            window.location.href = "List.html";
+        });
+
+        // =========================== setup login =======================
+        const loginForm = document.getElementById('loginForm');
+        const authBtn = document.getElementById('auth-btn');
+
+        const updateAuthUI = ()=>{
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userEmail = localStorage.getItem('userEmail');
+
+            if(isLoggedIn){
+                authBtn.innerText = `Logout (${userEmail})`;
+                authBtn.setAttribute('data-toggle', '');
+            }else{
+                authBtn.innerText = 'Login';
+                authBtn.classList.replace('btn-danger', 'btn-login');
+                authBtn.setAttribute('data-toggle', 'modal');
+            }
+
+        }
+        updateAuthUI();
+
+        loginForm.addEventListener('submit', (e)=>{
+            e.preventDefault();
+
+            const emailInput = document.getElementById('loginEmail').value.trim();
+            const passInput = document.getElementById('loginPassword').value.trim();
+
+            if(emailInput === ADMIN_ACCOUNT.email && passInput === ADMIN_ACCOUNT.password){
+                alert('Login successful!');
+
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userEmail', emailInput);
+
+                $('#loginModal').modal('hide')
+
+                updateAuthUI();
+            }else{
+                alert("Wrong email or password!");
+            }
+
+            
+        })
+
+        authBtn.addEventListener('click', ()=>{
+                if(localStorage.getItem('isLoggedIn') === 'true'){
+                    if(confirm("Do you want to logout?")){
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('userEmail');
+                        location.reload();
+                    }
+                } 
+            })
+    </script>
+</body>
+
+</html>

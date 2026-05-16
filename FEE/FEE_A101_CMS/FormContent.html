@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>Form content</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
+        <a class="navbar-brand" href="#">CMS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link dropdown-toggle text-primary" href="#" data-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="fa fa-user"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item border-bottom" href="./EditProfile.html"><i
+                                class="fa fa-user mr-2"></i>User Profile</a>
+                        <a onclick="handleLogout(event)" class="dropdown-item" href="#"><i class="fa fa-sign-out mr-2"></i>Logout</a>
+
+                    </div>
+                </li>
+
+
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="row">
+        <div class="col-3 border-right pr-0" style="min-height: 100vh; background-color: #f8f9fa;">
+            <div class="">
+                <div class="input-group mb-3 p-3 border-bottom">
+                    <input type="text" class="form-control" placeholder="Search">
+
+                    <div class="input-group-append">
+                        <span class="input-group-text bg-light" id="basic-addon2">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="list-group list-group-flush ">
+                    <a href="./ViewContent.html" class="list-group-item list-group-item-action  text-primary ">
+                        <i class="fa fa-th-list mr-2"></i> View contents
+                    </a>
+                    <a href="./FormContent.html"
+                        class="list-group-item list-group-item-action    text-primary active-sidebar">
+                        <i class="fa fa-edit mr-2"></i> Form content
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-grow-1 p-4 mt-3">
+            <h3>Add Content</h3>
+            <div class="card shadow-sm">
+                <div class="card-header">Content Form Elements</div>
+                <div class="card-body">
+                    <form style="max-width: 80%;" onsubmit="return handleSubmit(event)">
+                        <div class="form-group">
+                            <label for="titleInput">Title</label>
+                            <input type="email" class="form-control" id="titleInput" placeholder="Enter the title">
+                            <div class="invalid-feedback" id="titleError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="briefInput">Brief</label>
+                            <textarea class="form-control" id="briefInput" rows="3"></textarea>
+                            <div class="invalid-feedback" id="briefError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contentInput">Content</label>
+                            <textarea class="form-control" id="contentInput" rows="5"></textarea>
+                            <div class="invalid-feedback" id="contentError"></div>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn btn-success">Submit Button</button>
+                            <button class="btn btn-success">Reset Button</button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        const validateForm = () => {
+            const title = document.getElementById('titleInput');
+            const brief = document.getElementById('briefInput');
+            const content = document.getElementById('contentInput');
+
+            const titleError = document.getElementById('titleError');
+            const briefError = document.getElementById('briefError');
+            const contentError = document.getElementById('contentError');
+
+            let valid = true;
+
+            [title, brief, content].forEach(el => el.classList.remove('is-invalid'));
+
+            const tVal = title.value.trim();
+            if (tVal.length === 0) {
+                titleError.textContent = "Title is required!";
+                title.classList.add('is-invalid');
+                valid = false;
+            } else if (tVal.length < 10 || tVal.length > 200) {
+                titleError.textContent = "Title must be at least 10 and maximum 200 characters.";
+                title.classList.add('is-invalid');
+                valid = false;
+            }
+
+            const bVal = brief.value.trim();
+            if (bVal.length === 0) {
+                briefError.textContent = "Brief is required!";
+                brief.classList.add('is-invalid');
+                valid = false;
+            } else if (bVal.length < 30 || bVal.length > 150) {
+                briefError.textContent = "Brief must be at least 30 and maximum 150 characters.";
+                brief.classList.add('is-invalid');
+                valid = false;
+            }
+
+            const cVal = content.value.trim();
+            if (cVal.length === 0) {
+                contentError.textContent = "Content is required!";
+                content.classList.add('is-invalid');
+                valid = false;
+            } else if (cVal.length < 50 || cVal.length > 1000) {
+                contentError.textContent = "Content must be at least 50 and maximum 1000 characters.";
+                content.classList.add('is-invalid');
+                valid = false;
+            }
+
+            if (!valid) {
+                document.querySelector('.is-invalid').focus();
+            }
+
+            return valid;
+        };
+
+        const handleSubmit = (event) => {
+            event.preventDefault();
+
+            if (validateForm()) {
+                const newContent = {
+                    id: crypto.randomUUID(),
+                    title: document.getElementById('titleInput').value.trim(),
+                    brief: document.getElementById('briefInput').value.trim(),
+                    content: document.getElementById('contentInput').value.trim(),
+                    createdAt: new Date().toLocaleString()
+                };
+
+
+                let contents = JSON.parse(localStorage.getItem('contents')) || [];
+
+                contents.push(newContent);
+
+                localStorage.setItem('contents', JSON.stringify(contents));
+
+                alert("Đã lưu nội dung thành công!");
+
+
+            }
+        }
+
+        const handleReset = () => {
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.value = "";
+
+                input.classList.remove('is-invalid');
+            });
+
+            const errorMessages = document.querySelectorAll('.invalid-feedback');
+            errorMessages.forEach(error => error.textContent = "");
+
+            console.log("Form đã được làm trống hoàn toàn");
+        }
+        function handleLogout(event) {
+            event.preventDefault();
+
+            var confirmLogout = confirm("Are you sure to logout?");
+
+            if (confirmLogout) {
+                localStorage.removeItem('userProfile');
+
+                // alert("Logout succe!");
+                window.location.href = "Login.html";
+            }
+        }
+    </script>
+</body>
+
+
+
+</html>

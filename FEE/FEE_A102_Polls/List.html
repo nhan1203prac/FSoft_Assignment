@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>vote</title>
+</head>
+
+<body>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-4 w-80">
+
+                <div class="modal-body">
+                    <form id="loginForm" class="mb-5">
+                        <div class="form-group">
+                            <label for="loginEmail" class="font-weight-bold">Alias:</label>
+                            <input type="email" class="form-control" id="loginEmail" placeholder="email@example.com"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword" class="font-weight-bold">Password:</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password"
+                                required>
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label font-weight-bold" for="rememberMe">Remember me</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">Sign in</button>
+                    </form>
+                    <hr>
+                </div>
+                <div class="modal-footer border-0 justify-content-center mt-2">
+                    <button class="btn btn-light pl-3 pr-3 pt-1 pb-1  border-black" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container align-items-center">
+            <a class="navbar-brand brand" href="./index.html">Polls</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto nav-text">
+                    <li class="nav-item ">
+                        <a class="nav-link" href="./index.html">Vote <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./Create.html">Create</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="./List.html">List</a>
+                    </li>
+
+                </ul>
+                <button id="auth-btn" class="btn btn-login my-2 my-sm-0 " data-toggle="modal"
+                    data-target="#loginModal">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 btn-wrapper">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <button type="button" class="btn btn-success">Active</button>
+            <button type="button" class="btn btn-success">Drafts</button>
+            <button type="button" class="btn btn-success">Closed</button>
+        </div>
+        <table class="table table-bordered mt-4">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">The list of questions and issues within</th>
+                    <th scope="col">Management</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- <tr>
+                    <th scope="row">98</th>
+                    <td>Mark</td>
+                    <td>
+                        <button class="btn-view-result">View results</button>
+                        <button class="btn-close-poll">Close poll</button>
+                        <button class="btn-delete">Delete</button>
+
+                    </td>
+                </tr> -->
+
+
+            </tbody>
+        </table>
+
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        const ADMIN_ACCOUNT = {
+            email: "admin@gmail.com",
+            password: "123456"
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('table-body');
+
+            function renderTable() {
+                const polls = JSON.parse(localStorage.getItem('polls')) || [];
+                console.log(polls)
+                if (polls.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="3" class="text-center">No polls found.</td></tr>';
+                    return;
+                }
+
+                const rowsHtml = polls.map((poll, index) => {
+                    return `
+                <tr>
+                    <th scope="row">${poll?.id}</th>
+                    <td>${poll?.name}</td>
+                    <td>
+                        <button class="btn btn-success">View results</button>
+                        <button class="btn btn-success">Close poll</button>
+                        <button class="btn btn-success btn-delete" data-id="${poll.id}" >Delete</button>
+                    </td>
+                </tr>
+            `;
+                }).join('');
+
+                tableBody.innerHTML = rowsHtml;
+            }
+
+            $(document).ready(function () {
+                const $tableBody = $('#table-body');
+
+                $tableBody.on('click', '.btn-delete', function () {
+                    const $btn = $(this);
+                    const pollId = $btn.data('id');
+
+                    if (confirm('Are you sure you want to delete this item?')) {
+
+                        $.ajax({
+                            url: '/api/polls/delete', // Đường dẫn giả định gửi lên server
+                            method: 'DELETE',           
+                            data: { id: pollId },
+                            complete: function () {
+                                let polls = JSON.parse(localStorage.getItem('polls')) || [];
+                                polls = polls.filter(p => p.id !== pollId);
+                                localStorage.setItem('polls', JSON.stringify(polls));
+
+                                alert("Deleted successfully!");
+
+                                location.reload();
+                            },
+                            // error: function () {
+                            //     alert("An error occurred while deleting.");
+                            // }
+                        });
+                    }
+                });
+            });
+            renderTable();
+
+
+            // ============================ setup login ========================================
+            const loginForm = document.getElementById('loginForm');
+            const authBtn = document.getElementById('auth-btn');
+
+            function updateAuthUI() {
+                const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                const userEmail = localStorage.getItem('userEmail');
+
+                if (isLoggedIn) {
+                    authBtn.innerText = `Logout (${userEmail})`;
+                    authBtn.setAttribute('data-toggle', '');
+                } else {
+                    authBtn.innerText = "Login";
+                    authBtn.classList.replace('btn-danger', 'btn-login');
+                    authBtn.setAttribute('data-toggle', 'modal');
+                }
+            }
+
+            updateAuthUI();
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const emailInput = document.getElementById('loginEmail').value.trim();
+                const passInput = document.getElementById('loginPassword').value.trim();
+
+                if (emailInput === ADMIN_ACCOUNT.email && passInput === ADMIN_ACCOUNT.password) {
+                    alert("Login successful!");
+
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userEmail', emailInput);
+
+                    $('#loginModal').modal('hide');
+
+                    updateAuthUI();
+                } else {
+                    alert("Wrong email or password!");
+                }
+            });
+
+            authBtn.addEventListener('click', () => {
+                if (localStorage.getItem('isLoggedIn') === 'true') {
+                    if (confirm("Do you want to logout?")) {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('userEmail');
+                        location.reload();
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

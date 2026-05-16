@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cập nhật Đăng ký - LinguaVault</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+
+    <style>
+        body { background-color: #ffffff; font-family: Arial, sans-serif; color: #333; }
+        .navbar { border-bottom: 1px solid #ddd; }
+        .card { border: 1px solid #ccc; border-radius: 2px; box-shadow: none; }
+        .card-header {
+            background-color: #f8f9fa !important;
+            border-bottom: 1px solid #ccc !important;
+            border-radius: 0 !important;
+            color: #333 !important;
+        }
+        .section-header {
+            padding: .5rem 1rem;
+            background-color: #eee;
+            border-left: 4px solid #666;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .old-value-hint { font-size: 0.8rem; color: #777; font-style: italic; }
+        .btn, .form-control, .form-select { border-radius: 2px; }
+        .rule-box {
+            border: 1px solid #ffeeba;
+            background-color: #fff3cd;
+            padding: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/}">LinguaVault</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/registrations/new}">Đăng ký mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/registrations}">Danh sách</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/registrations}" class="text-secondary">Danh sách</a>
+                </li>
+                <li class="breadcrumb-item active">Cập nhật bản ghi</li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold">Cập nhật Đăng ký #<span th:text="${registration.registrationID}"></span></h4>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success py-2 rounded-0"
+         th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}"   class="alert alert-danger py-2 rounded-0"
+         th:text="${errorMessage}"></div>
+    <div th:if="${packageError}"   class="alert alert-danger py-2 rounded-0"
+         th:text="${packageError}"></div>
+
+    <div class="rule-box">
+        <strong>Quy tắc:</strong> Gói học mới phải có giá trị (giá mỗi buổi) cao hơn gói hiện tại.
+        Tổng tiền sẽ được tính lại tự động khi thay đổi Gói, Quốc gia hoặc Số buổi.
+    </div>
+
+    <div class="card">
+        <div class="card-header py-2 fw-bold small text-uppercase">
+            Chỉnh sửa thông tin
+        </div>
+
+        <div class="card-body">
+
+            <form th:action="@{/registrations/update/{id}(id=${registration.registrationID})}"
+                  th:object="${registration}"
+                  method="post" id="editForm" novalidate>
+
+                <input type="hidden" id="oldPackageCost"
+                       th:value="${oldPackageCost}" name="oldPackageCost"/>
+
+                <input type="hidden" th:field="*{registrationID}"/>
+
+                <div class="section-header text-uppercase">1. Thông tin cố định (Chỉ đọc)</div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">ID Đăng ký</label>
+                        <!-- th:value + readonly: display only, NOT th:field -->
+                        <input class="form-control form-control-sm bg-light" readonly
+                               th:value="${registration.registrationID}"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Số điện thoại</label>
+                        <input class="form-control form-control-sm bg-light" readonly
+                               th:value="${registration.phoneNumber}"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Ngày bắt đầu</label>
+                        <input class="form-control form-control-sm bg-light" readonly
+                               th:value="${registration.effectiveDate != null
+                                   ? #temporals.format(registration.effectiveDate,'dd/MM/yyyy') : ''}"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Ngày kết thúc</label>
+                        <input class="form-control form-control-sm bg-light" readonly
+                               th:value="${registration.expirationDate != null
+                                   ? #temporals.format(registration.expirationDate,'dd/MM/yyyy') : ''}"/>
+                    </div>
+                </div>
+
+                <div class="section-header text-uppercase">2. Thông tin điều chỉnh</div>
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold" for="fullName">Họ và tên *</label>
+                        <input type="text" class="form-control form-control-sm" id="fullName"
+                               th:field="*{fullName}"
+                               th:classappend="${#fields.hasErrors('fullName')} ? ' is-invalid'"
+                               required/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}"
+                             th:errors="*{fullName}">Họ tên không được để trống.
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold" for="countryID">Quốc gia *</label>
+                        <select class="form-select form-select-sm" id="countryID"
+                                th:field="*{countryID}"
+                                th:classappend="${countryError != null} ? ' is-invalid'"
+                                required>
+                            <option value="">— Chọn —</option>
+                            <option th:each="c : ${countries}"
+                                    th:value="${c.countryID}"
+                                    th:text="${c.countryName}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${countryError}" th:text="${countryError}"></div>
+                        <div class="old-value-hint mt-1">
+                            Hiện tại: <span th:text="${oldCountryName}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Package: RegistrationDTO.packageID (flat String, NOT lessonPackage.packageID) -->
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold" for="packageID">Gói học *</label>
+                        <select class="form-select form-select-sm" id="packageID"
+                                th:field="*{packageID}"
+                                th:classappend="${packageError != null} ? ' is-invalid'"
+                                required>
+                            <option value="">— Chọn —</option>
+                            <option th:each="p : ${packages}"
+                                    th:value="${p.packageID}"
+                                    th:text="${p.packageID + ' ($' + p.costOfLessons + '/buổi)'}"
+                                    th:attr="data-cost=${p.costOfLessons}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${packageError}" th:text="${packageError}"></div>
+                        <!-- Display old value using ${registration.xxx} -->
+                        <div class="old-value-hint mt-1">
+                            Hiện tại: <span th:text="${oldPackageName} + ' ($' + ${oldPackageCost} + '/buổi)'"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold" for="numLessons">Số buổi học *</label>
+                        <input type="number" class="form-control form-control-sm" id="numLessons"
+                               th:field="*{numLessons}"
+                               min="1" required/>
+                        <div class="invalid-feedback" id="numLessonsError">
+                            Số buổi học phải lớn hơn 0.
+                        </div>
+                        <div class="old-value-hint mt-1">
+                            Hiện tại: <span th:text="${registration.numLessons}">0</span> buổi
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header text-uppercase">3. Tính toán lại chi phí</div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-7">
+                        <div class="p-3 border bg-white">
+                            <label class="small text-muted">Tổng tiền (Tạm tính):</label>
+                            <h2 class="text-primary fw-bold mb-1" id="totalDisplay">
+                                $<span th:text="${registration.totalAmount != null
+                                    ? #numbers.formatDecimal(registration.totalAmount,1,2) : '0.00'}">0.00</span>
+                            </h2>
+                            <p class="small text-secondary mb-0" id="breakdownText">
+                                Thay đổi thông tin để tính lại tiền.
+                            </p>
+                        </div>
+                        <input type="hidden" id="totalAmount" th:field="*{totalAmount}"/>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="small fw-bold">Chiết khấu áp dụng:</label>
+                        <div class="list-group small">
+                            <div id="badgeVN" class="list-group-item list-group-item-light py-1">
+                                Giảm 5% (Khách VN)
+                            </div>
+                            <div id="badge30" class="list-group-item list-group-item-light py-1">
+                                Giảm 10% (&gt; 30 buổi)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a th:href="@{/registrations}" class="btn btn-secondary btn-sm px-4">Hủy</a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const oldPackageCost = /*[[${oldPackageCost}]]*/ 0;
+
+    document.addEventListener('DOMContentLoaded', calculateTotal);
+
+    function calculateTotal() {
+        const pkgSelect     = document.getElementById('packageID');
+        const numLessons    = parseInt(document.getElementById('numLessons').value) || 0;
+        const countryID     = document.getElementById('countryID').value;
+        const selectedOpt   = pkgSelect.options[pkgSelect.selectedIndex];
+        const costPerLesson = parseFloat(selectedOpt?.dataset?.cost) || 0;
+
+        if (!costPerLesson || numLessons <= 0) {
+            document.getElementById('totalDisplay').textContent = '$0.00';
+            document.getElementById('breakdownText').textContent = 'Nhập đủ thông tin để tính tiền.';
+            document.getElementById('totalAmount').value = '';
+            updateStatus('badgeVN', false);
+            updateStatus('badge30', false);
+            return;
+        }
+
+        let base = numLessons * costPerLesson;
+        let breakdown = `${numLessons} buổi × $${costPerLesson.toFixed(2)}`;
+        let d30 = false, dVN = false;
+
+        if (numLessons > 30) {
+            const extra = numLessons - 30;
+            base -= extra * costPerLesson * 0.10;
+            breakdown += ` (–10% cho ${extra} buổi dôi)`;
+            d30 = true;
+        }
+
+        if (countryID === 'VN') {
+            base *= 0.95;
+            breakdown += ' → –5% VN';
+            dVN = true;
+        }
+
+        document.getElementById('totalDisplay').textContent  = '$' + base.toFixed(2);
+        document.getElementById('breakdownText').textContent = breakdown;
+        document.getElementById('totalAmount').value         = base.toFixed(2);
+
+        updateStatus('badgeVN', dVN);
+        updateStatus('badge30', d30);
+    }
+
+    function updateStatus(id, active) {
+        document.getElementById(id).className = active
+            ? 'list-group-item list-group-item-success py-1'
+            : 'list-group-item list-group-item-light py-1';
+    }
+
+    document.getElementById('packageID').addEventListener('change', calculateTotal);
+    document.getElementById('numLessons').addEventListener('input',  calculateTotal);
+    document.getElementById('countryID').addEventListener('change',  calculateTotal);
+
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        let valid = true;
+
+        const numField   = document.getElementById('numLessons');
+        const numLessons = parseInt(numField.value);
+        if (!numLessons || numLessons <= 0) {
+            numField.classList.add('is-invalid');
+            valid = false;
+        } else {
+            numField.classList.remove('is-invalid');
+        }
+
+        const pkgSelect   = document.getElementById('packageID');
+        const selectedOpt = pkgSelect.options[pkgSelect.selectedIndex];
+        const newPackageID = pkgSelect.value;
+        const newCost      = parseFloat(selectedOpt?.dataset?.cost) || 0;
+
+
+        const oldPackageID = /*[[${registration.packageID}]]*/ '';
+
+        if (newPackageID !== oldPackageID) {
+            if (newCost > 0 && newCost <= oldPackageCost) {
+                pkgSelect.classList.add('is-invalid');
+
+                let errorFeedback = pkgSelect.parentNode.querySelector('.invalid-feedback');
+                if (errorFeedback) {
+                    errorFeedback.textContent = `Gói mới phải có giá/buổi cao hơn gói cũ ($${oldPackageCost}/buổi).`;
+                }
+
+                valid = false;
+            } else {
+                pkgSelect.classList.remove('is-invalid');
+            }
+        } else {
+            pkgSelect.classList.remove('is-invalid');
+        }
+
+        if (!valid) e.preventDefault();
+    });
+</script>
+</body>
+</html>

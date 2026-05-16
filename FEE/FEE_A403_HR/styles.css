@@ -1,0 +1,22 @@
+::placeholder{
+    color:lightgray  !important;
+}
+.form-control {
+    width: auto !important;
+    min-width: 250px; 
+    display: inline-block;
+}
+
+textarea.form-control {
+    width: 100% !important; 
+    max-width: 500px;
+}
+
+.banner-top {
+    height: 250px; 
+    object-fit: cover; 
+    object-position: center;
+}
+
+
+/* ================ search ================ */

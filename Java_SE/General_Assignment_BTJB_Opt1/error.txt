@@ -1,0 +1,3 @@
+Row 3: Invalid phone - 123456789
+Row 3: Invalid email - an@@gmail.com
+Row 4: Invalid email - binh@gmail

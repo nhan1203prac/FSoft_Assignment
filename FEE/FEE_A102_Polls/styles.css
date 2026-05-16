@@ -1,0 +1,83 @@
+
+::placeholder{
+    color:lightgray;
+}
+.brand{
+    font-size: 25px;
+}
+.btn-login{
+    color:rgba(255, 255, 255, 0.737);
+    font-size: 18px;
+}
+.btn-login:hover{
+    color:rgba(255, 255, 255, 0.886);
+
+}
+.nav-text{
+    font-size: 18px;
+}
+.nav-text li{
+    padding: 0 15px;
+
+
+}
+.btn-wrap{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-retain{
+    /* background: rgba(245, 245, 245, 0.514); */
+    border:1px solid rgba(128, 128, 128, 0.379);
+    padding: 7px 17px;
+    margin-top: 20px;
+    margin-right: 42%;
+}
+
+/* .btn-retain:hover{
+    background: rgba(83, 82, 82, 0.116);
+} */
+.poll-list ol li{
+    margin: 10px 0;
+}
+
+.input-field{
+    width: 100%;
+    max-width: 600px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input-field:focus,
+.input-field:hover{
+    border:1px solid rgb(35, 80, 228);
+    box-shadow: 0 0 5px rgb(35, 80, 228);
+}
+
+/* .btn-view-result, 
+.btn-close-poll,
+.btn-delete{
+    border-radius: 4px;
+    border:1px solid rgba(0, 0, 0, 0.242);
+    padding: 0 8px;
+}
+
+.btn-view-result:hover, 
+.btn-close-poll:hover,
+.btn-delete:hover {
+    background: #0000003f;
+} */
+
+#answers-container .input-group-append {
+    display: none;
+}
+
+#answers-container .input-group:last-child .input-group-append {
+    display: block;
+}
+.add-answer-btn{
+    border-top-right-radius: 5px !important;
+    border-bottom-right-radius: 5px !important;
+}
