@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý danh sách thành viên</title>
+  <!-- Nhúng Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8fafc;
+      min-height: 100vh;
+    }
+    .navbar-custom {
+      background-color: #0f172a;
+    }
+    .table-card {
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+  </style>
+</head>
+<body>
+
+<!-- 1. THANH MENU HEADER TOÀN CỤC -->
+<nav class="navbar navbar-expand-lg navbar-custom navbar-dark mb-4 shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold tracking-wide" th:href="@{/users}">RAM MVC SYSTEM</a>
+    <div class="d-flex align-items-center ms-auto">
+      <!-- Hiển thị câu chào đích danh người đang giữ Session -->
+      <span class="text-white-50 me-3 small">
+                Xin chào, <strong class="text-white" th:text="${currentUser.fullName != null ? currentUser.fullName : currentUser.username}">User</strong>!
+            </span>
+      <a th:href="@{/users/my-profile/edit}" class="btn btn-outline-light btn-sm me-2fw-semibold">⚙️ Sửa cá nhân</a>
+      <a th:href="@{/logout}" class="btn btn-danger btn-sm fw-semibold shadow-sm">Đăng xuất</a>
+    </div>
+  </div>
+</nav>
+
+<!-- 2. KHÔNG GIAN HIỂN THỊ NỘI DUNG CHÍNH -->
+<div class="container">
+
+  <!-- 🟢 ĐÓN NHẬN PARAMETER REDIRECT TỪ HÀM UPDATE PROFILE -->
+  <div th:if="${param.updateSuccess}" class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-3" role="alert">
+    🎉 <strong>Thành công!</strong> Hồ sơ cá nhân của bạn đã được cập nhật đồng bộ lên bộ nhớ RAM.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <!-- 🔵 ĐÓN NHẬN PARAMETER REDIRECT TỪ LUỒNG ADMIN SỬA ROLE -->
+  <div th:if="${param.roleSuccess}" class="alert alert-info alert-dismissible fade show shadow-sm border-0 mb-3" role="alert">
+    🔑 <strong>Hệ thống:</strong> Phân quyền cấu hình tài khoản đã được Admin cập nhật thành công!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <!-- 🟡 ĐÓN NHẬN PARAMETER NẾU USER THƯỜNG CỐ TÌNH LEO THANG LÊN FORM ADMIN -->
+  <div th:if="${param.unauthorized}" class="alert alert-warning alert-dismissible fade show shadow-sm border-0 mb-3" role="alert">
+    ⚠️ <strong>Từ chối truy cập:</strong> Tài khoản của bạn không đủ thẩm quyền Admin để thực hiện hành động này!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <!-- TIÊU ĐỀ KHU VỰC -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="text-dark fw-bold mb-0">DANH SÁCH THÀNH VIÊN TRÊN H2 DB</h4>
+    <span class="badge bg-secondary px-3 py-2 fs-7 shadow-sm" th:text="${users.size() + ' Bản ghi'}">0 bản ghi</span>
+  </div>
+
+  <!-- 3. BẢNG DỮ LIỆU ĐỊNH DẠNG TABLE -->
+  <div class="card table-card border-0 bg-white mb-5">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-secondary uppercase small fw-bold">
+        <tr>
+          <th class="ps-4" style="width: 100px;">Mã Số ID</th>
+          <th>Tài Khoản</th>
+          <th>Họ và Tên</th>
+          <th>Thông Tin Liên Hệ</th>
+          <th>Vai Trò Hệ Thống</th>
+          <th>Người Tạo (Audit)</th>
+          <th class="text-end pe-4" style="width: 180px;">Hành Động</th>
+        </tr>
+        </thead>
+        <tbody class="text-dark small border-top-0">
+        <!-- Vòng lặp Thymeleaf lặp qua danh sách users gửi từ Controller -->
+        <tr th:each="user : ${users}">
+          <!-- ID Người dùng -->
+          <td class="ps-4 fw-semibold text-secondary" th:text="${user.id}">USER_001</td>
+
+          <!-- Tài khoản & Email -->
+          <td>
+            <div class="fw-bold" th:text="${user.username}">username</div>
+            <div class="text-muted small" th:text="${user.email}">email@example.com</div>
+          </td>
+
+          <!-- Họ và Tên -->
+          <td th:text="${user.fullName != null and user.fullName != '' ? user.fullName : '---'}" class="fw-medium">Nguyễn Văn A</td>
+
+          <!-- Điện thoại & Địa chỉ -->
+          <td>
+            <div th:text="${user.phoneNumber != null and user.phoneNumber != '' ? user.phoneNumber : '---'}">09xx</div>
+            <div class="text-muted text-truncate" style="max-width: 150px;" th:text="${user.address != null ? user.address : ''}">Đà Nẵng</div>
+          </td>
+
+          <!-- Badge hiển thị vai trò (Role) -->
+          <td>
+                            <span th:each="role : ${user.roles}"
+                                  class="badge me-1 px-2 py-1.5 shadow-xs fw-semibold"
+                                  th:classappend="${role == 'ROLE_ADMIN'} ? 'bg-danger-subtle text-danger border border-danger-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle'"
+                                  th:text="${role}">
+                                ROLE_USER
+                            </span>
+          </td>
+
+          <!-- Ghi nhận Audit tự động ngầm -->
+          <td>
+            <div class="fw-semibold text-secondary" th:text="${user.createdBy != null ? user.createdBy : 'SYSTEM'}">admin</div>
+            <div class="text-muted" style="font-size: 11px;" th:text="${#temporals.format(user.createdAt, 'dd-MM-yyyy HH:mm')}">24-05-2026 15:00</div>
+          </td>
+
+          <!-- CỘT CHỨA CÁC NÚT EDIT HÀNH ĐỘNG -->
+          <td class="text-end pe-4">
+            <!-- NÚT 1: Sửa thông tin cá nhân (Ai cũng thấy nhưng chỉ click được nếu chính là mình) -->
+            <a th:if="${currentUser.id == user.id}"
+               th:href="@{/users/my-profile/edit}"
+               class="btn btn-sm btn-dark fw-bold px-3 shadow-sm me-1">
+              📝 Sửa cá nhân
+            </a>
+
+            <!-- NÚT 2: Sửa quyền Admin (BẢO MẬT: Chỉ hiển thị ra màn hình nếu người đăng nhập có quyền ROLE_ADMIN) -->
+            <a th:if="${currentUser.roles.contains('ROLE_ADMIN')}"
+               th:href="@{/users/admin/edit-role/{id}(id=${user.id})}"
+               class="btn btn-sm btn-outline-danger fw-bold px-2.5">
+              🔑 Cấu hình Role
+            </a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Nhúng Bootstrap 5 Bundle JS (bao gồm Popper để đóng Alert thông báo) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
