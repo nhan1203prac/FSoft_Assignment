@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+<head>
+    <title>Thống kê sử dụng tổng hợp</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">THỐNG KÊ CHI TIẾT SỬ DỤNG MÁY TÍNH VÀ DỊCH VỤ</h3>
+            <small class="text-muted">Màn hình tổng hợp thông tin khách hàng hiện đang sử dụng máy và dịch vụ</small>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                <tr>
+                    <th class="border-0 px-3">Mã KH</th>
+                    <th class="border-0">Tên Khách Hàng</th>
+                    <th class="border-0">Mã Máy</th>
+                    <th class="border-0">Vị Trí</th>
+                    <th class="border-0">Trạng Thái Máy</th>
+                    <th class="border-0">Ngày BĐ Máy</th>
+                    <th class="border-0">Giờ BĐ Máy</th>
+                    <th class="border-0 text-center">Thời Gian (Phút)</th>
+                    <th class="border-0">Mã DV</th>
+                    <th class="border-0">Ngày SD DV</th>
+                    <th class="border-0">Giờ SD DV</th>
+                    <th class="border-0 text-center">SL</th>
+                    <th class="border-0 text-end pe-3">Tổng Tiền DV (Total Amount)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(reports)}">
+                    <td colspan="13" class="text-center py-4 fw-semibold text-muted">
+                        Hiện tại chưa có dữ liệu đăng ký sử dụng nào trong hệ thống!
+                    </td>
+                </tr>
+
+                <tr th:each="r : ${reports}">
+                    <td class="px-3 fw-bold text-primary" th:text="${r.maKH}">KH00001</td>
+                    <td class="fw-semibold text-dark" th:text="${r.tenKH}">Nguyễn Văn A</td>
+                    <td class="fw-bold text-secondary" th:text="${r.maMay}">MAY001</td>
+                    <td th:text="${r.viTri}">Phòng A - Máy 01</td>
+                    <td>
+                        <span class="badge rounded-pill px-3 py-2"
+                              th:classappend="${r.trangThai == 'Available' || r.trangThai == 'Rảnh' ? 'bg-success' : (r.trangThai == 'Bận' || r.trangThai == 'Occupied' ? 'bg-danger' : 'bg-warning text-dark')}"
+                              th:text="${r.trangThai}">Rảnh
+                        </span>
+                    </td>
+                    <td th:text="${r.ngayBatDauMay != null ? #temporals.format(r.ngayBatDauMay, 'dd/MM/yyyy') : '-'}">15/05/2026</td>
+                    <td th:text="${r.gioBatDauMay}">08:30</td>
+                    <td class="text-center" th:text="${r.thoiGianSuDung}">120</td>
+
+                    <td class="fw-bold text-info" th:text="${r.maDV != null ? r.maDV : '-'}">DV001</td>
+                    <td th:text="${r.ngaySuDungDV != null ? #temporals.format(r.ngaySuDungDV, 'dd/MM/yyyy') : '-'}">15/05/2026</td>
+                    <td th:text="${r.gioSuDungDV != null ? r.gioSuDungDV : '-'}">09:00</td>
+                    <td class="text-center" th:text="${r.soLuong > 0 ? r.soLuong : '-'}">2</td>
+
+                    <td class="fw-bold text-primary text-end pe-3"
+                        th:text="${r.tongTienDichVu != null ? #numbers.formatDecimal(r.tongTienDichVu, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '0 VNĐ'}">
+                        35,000 VNĐ
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-center">
+        <nav th:if="${totalPages > 0}">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link border-0 shadow-sm mx-1 rounded"
+                       th:href="@{/report/usage(page=${currentPage - 1})}">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </a>
+                </li>
+
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link border-0 shadow-sm mx-1 rounded"
+                       th:href="@{/report/usage(page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link border-0 shadow-sm mx-1 rounded"
+                       th:href="@{/report/usage(page=${currentPage + 1})}">
+                        <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+</body>
+</html>

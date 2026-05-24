@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+        <property name="hibernate.connection.url">jdbc:sqlserver://DESKTOP-U2GTCVE:1433;databaseName=polls_db;encrypt=true;trustServerCertificate=true;</property>
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password">123456789</property>
+
+        <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <property name="hibernate.connection.pool_size">10</property>
+
+        <mapping class="com.polls.model.Poll"/>
+        <mapping class="com.polls.model.Question"/>
+        <mapping class="com.polls.model.Answer"/>
+        <mapping class="com.polls.model.PollQuestion"/>
+        <mapping class="com.polls.model.QuestionAnswer"/>
+        <mapping class="com.polls.model.User"/>
+        <mapping class="com.polls.model.AnswerUser"/>
+    </session-factory>
+</hibernate-configuration>

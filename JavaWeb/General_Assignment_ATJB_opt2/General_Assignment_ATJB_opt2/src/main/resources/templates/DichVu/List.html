@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+<head>
+  <title>Danh sách dịch vụ</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold text-dark mb-0">QUẢN LÝ DỊCH VỤ</h3>
+      <small class="text-muted">Danh sách tất cả dịch vụ trong hệ thống</small>
+    </div>
+    <a href="/services/create" class="btn btn-primary px-4">
+      <i class="fa-solid fa-plus me-2"></i>Thêm mới
+    </a>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <form action="/services" method="get" class="row g-2">
+        <div class="col-md-10">
+          <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i
+                                class="fa-solid fa-search text-muted"></i></span>
+            <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0"
+                   placeholder="Tìm theo tên hoặc mã dịch vụ...">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-dark w-100">Tìm kiếm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+        <tr>
+          <th class="border-0 px-3">Mã DV</th>
+          <th class="border-0">Tên dịch vụ</th>
+          <th class="border-0">Đơn vị tính</th>
+          <th class="border-0">Đơn giá</th>
+          <th class="border-0 text-center">Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${services}">
+          <td class="px-3 fw-bold text-primary" th:text="${s.maDV}">DV001</td>
+          <td>
+            <div class="d-flex align-items-center">
+              <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                   style="width: 30px; height: 30px; font-size: 12px;"
+                   th:text="${#strings.substring(s.tenDV,0,1)}">D
+              </div>
+              <span th:text="${s.tenDV}">Nước ngọt</span>
+            </div>
+          </td>
+          <td th:text="${s.donViTinh}">Chai</td>
+          <td th:text="${#numbers.formatDecimal(s.donGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">10,000 VNĐ</td>
+          <td class="text-center">
+            <div class="btn-group shadow-sm rounded">
+              <a th:href="@{'/services/edit/' + ${s.maDV}}" class="btn btn-white btn-sm border"><i
+                      class="fa-solid fa-edit text-warning"></i></a>
+              <a href="javascript:void(0)" onclick="deleteRow(this)" class="btn btn-white btn-sm border">
+                <i class="fa-solid fa-trash text-danger"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-center">
+    <nav th:if="${totalPages > 0}">
+      <ul class="pagination">
+        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+          <a class="page-link border-0 shadow-sm mx-1 rounded"
+             th:href="@{/services(keyword=${keyword}, page=${currentPage - 1})}">
+            <i class="fa-solid fa-angle-left"></i>
+          </a>
+        </li>
+
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+            th:classappend="${currentPage == i} ? 'active'">
+          <a class="page-link border-0 shadow-sm mx-1 rounded"
+             th:href="@{/services(keyword=${keyword}, page=${i})}" th:text="${i + 1}">1</a>
+        </li>
+
+        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+          <a class="page-link border-0 shadow-sm mx-1 rounded"
+             th:href="@{/services(keyword=${keyword}, page=${currentPage + 1})}">
+            <i class="fa-solid fa-angle-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<script>
+  function deleteRow(btn) {
+    if (confirm('Bạn có chắc chắn muốn xóa dịch vụ này không?')) {
+      const row = btn.closest('tr');
+
+      if (row) {
+        row.remove();
+      }
+    }
+  }
+</script>
+
+</body>
+</html>

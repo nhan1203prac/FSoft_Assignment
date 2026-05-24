@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+<head>
+    <title th:text="${mode == 'create' ? 'Thêm máy tính mới' : 'Cập nhật máy tính'}"></title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/computers" class="text-decoration-none">Quản lý máy tính</a></li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${mode == 'create' ? 'Thêm mới' : 'Chỉnh sửa'}"></li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold text-dark" th:text="${mode == 'create' ? 'THÊM MÁY TÍNH MỚI' : 'CẬP NHẬT MÁY TÍNH'}"></h3>
+    </div>
+
+    <div id="jsErrorBlock" class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-3 d-none" role="alert">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
+        <span id="jsErrorMsg">Lỗi nhập liệu phía giao diện...</span>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form onsubmit="return validate()" th:action="@{/computers/save}" th:object="${computer}" method="post">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Mã Máy <span class="text-danger">*</span></label>
+                        <input id="inputMaMay" type="text" th:field="*{maMay}" class="form-control"
+                               placeholder="Ví dụ: MAY001"
+                               th:readonly="${mode == 'edit'}">
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('maMay')}" th:errors="*{maMay}"></div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Vị Trí Đặt Máy <span class="text-danger">*</span></label>
+                        <input type="text" th:field="*{viTri}" class="form-control"
+                               placeholder="Ví dụ: Phòng A - Máy 10">
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('viTri')}" th:errors="*{viTri}"></div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Trạng Thái <span class="text-danger">*</span></label>
+                        <select th:field="*{trangThai}" class="form-select">
+                            <option value="">-- Chọn trạng thái --</option>
+                            <option value="Available">Available</option>
+                            <option value="Occupied">Occupied</option>
+                            <option value="Under repair">Under repair</option>
+                        </select>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('trangThai')}" th:errors="*{trangThai}"></div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/computers" class="btn btn-light px-4 border">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fa-solid fa-save me-2"></i>Lưu thông tin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script layout:fragment="scripts">
+    function validate() {
+        const maMay = document.getElementById("inputMaMay").value.trim();
+        const errorBlock = document.getElementById("jsErrorBlock");
+        const errorMsg = document.getElementById("jsErrorMsg");
+
+        const maMayRegex = /^MAY\d{3}$/;
+
+        if (!maMayRegex.test(maMay)) {
+            errorMsg.innerText = "Mã máy không hợp lệ! Phải đúng định dạng MAYxxx (Ví dụ: MAY001, MAY023).";
+            errorBlock.classList.remove("d-none");
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            return false;
+        }
+
+        errorBlock.classList.add("d-none");
+        return true;
+    }
+</script>
+</body>
+</html>

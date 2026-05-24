@@ -1,0 +1,92 @@
+/* styles.css - Polls Application */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Poll item card on vote page */
+.poll-item {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Input fields */
+.input-field {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+.input-field:focus {
+    border-color: #28a745;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
+}
+
+/* Question block on create page */
+.question-block {
+    background: #fff;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Retain / Submit button */
+.btn-retain {
+    min-width: 140px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.btn-wrap {
+    margin-top: 24px;
+}
+
+/* Required asterisk */
+.required {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Progress bar results */
+.progress {
+    height: 22px;
+    border-radius: 4px;
+}
+.progress-bar {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Table tweaks */
+.table th, .table td {
+    vertical-align: middle;
+}
+
+/* Badge status */
+.badge {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+}
+
+/* Login modal */
+#login-error {
+    font-size: 0.9rem;
+}
+
+/* Navbar active */
+.navbar-nav .nav-item.active > .nav-link {
+    font-weight: 700;
+    color: #fff !important;
+}

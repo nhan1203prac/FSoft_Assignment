@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+<head>
+    <title th:text="${mode == 'edit'} ? 'Sửa khách hàng' : 'Thêm khách hàng'"></title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-primary">
+                        <i class="fa-solid fa-user-pen me-2"></i>
+                        <span th:text="${mode == 'edit'} ? 'CẬP NHẬT KHÁCH HÀNG' : 'THÊM KHÁCH HÀNG MỚI'"></span>
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <div th:if="${errorMsg}" class="alert alert-danger shadow-sm mb-3" th:text="${errorMsg}"></div>
+                    <form action="/customers/save"
+                          th:object="${customer}"
+                          method="post"
+                          id="customerForm">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mã khách hàng:</label>
+                            <input type="text" th:field="*{maKH}" class="form-control" id="maKH"
+                                   placeholder="Ví dụ: KH00001" th:readonly="${mode == 'edit'}">
+                            <div class="invalid-feedback">Mã KH phải có dạng KHxxxxx (Ví dụ: KH00001).</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Họ và tên:</label>
+                            <input type="text" th:field="*{tenKH}" class="form-control" id="tenKH">
+                            <div class="invalid-feedback">Họ tên phải từ 2 ký tự trở lên.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Số điện thoại:</label>
+                            <input type="text" th:field="*{soDienThoai}" class="form-control" id="soDienThoai">
+                            <div class="invalid-feedback">Số điện thoại không hợp lệ.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Địa chỉ Email:</label>
+                            <input type="text" th:field="*{diaChiEmail}" class="form-control" id="diaChiEmail">
+                            <div class="invalid-feedback">Email không đúng định dạng.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Địa chỉ:</label>
+                            <input type="text" th:field="*{diaChi}" class="form-control" id="diaChi">
+                            <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
+                        </div>
+                        <div class="mt-4 d-flex gap-2 justify-content-end">
+                            <a href="/customers" class="btn btn-light border px-4">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary px-4">Lưu dữ liệu</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        document.getElementById('customerForm').addEventListener('submit', function (e) {
+            let isValid = true;
+
+            const maKH = document.getElementById('maKH');
+            const tenKH = document.getElementById('tenKH');
+            const sdt = document.getElementById('soDienThoai');
+            const email = document.getElementById('diaChiEmail');
+            const diaChi = document.getElementById('diaChi');
+
+            const khachHangRegex = /^KH\d{5}$/;
+            const phoneRegex = /^0[35789]\d{8}$/;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            function validateField(el, condition) {
+                if (!condition) {
+                    el.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    el.classList.remove('is-invalid');
+                    el.classList.add('is-valid');
+                }
+            }
+
+            validateField(maKH, khachHangRegex.test(maKH.value.trim()));
+            validateField(tenKH, tenKH.value.trim().length >= 2);
+            validateField(sdt, phoneRegex.test(sdt.value.trim()));
+            validateField(email, emailRegex.test(email.value.trim()));
+            validateField(diaChi, diaChi.value.trim() !== "");
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

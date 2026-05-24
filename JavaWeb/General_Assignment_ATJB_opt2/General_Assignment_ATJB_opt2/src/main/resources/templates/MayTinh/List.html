@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+<head>
+    <title>Danh sách máy tính</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">QUẢN LÝ MÁY TÍNH</h3>
+            <small class="text-muted">Danh sách tất cả máy tính trong hệ thống</small>
+        </div>
+        <a href="/computers/create" class="btn btn-primary px-4">
+            <i class="fa-solid fa-plus me-2"></i>Thêm mới
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form action="/computers" method="get" class="row g-2">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i
+                                class="fa-solid fa-search text-muted"></i></span>
+                        <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0"
+                               placeholder="Tìm theo mã máy hoặc vị trí...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-dark w-100">Tìm kiếm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                <tr>
+                    <th class="border-0 px-3">Mã Máy</th>
+                    <th class="border-0">Vị trí</th>
+                    <th class="border-0">Trạng thái</th>
+                    <th class="border-0 text-center">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${computers}">
+                    <td class="px-3 fw-bold text-primary" th:text="${m.maMay}">MAY001</td>
+                    <td th:text="${m.viTri}">Phòng A - Máy 01</td>
+                    <td>
+                        <span class="badge rounded-pill px-3 py-2"
+                              th:classappend="${m.trangThai == 'Rảnh' ? 'bg-success' : (m.trangThai == 'Bận' ? 'bg-danger' : 'bg-warning text-dark')}"
+                              th:text="${m.trangThai}">Rảnh
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group shadow-sm rounded">
+                            <a th:href="@{'/computers/edit/' + ${m.maMay}}" class="btn btn-white btn-sm border"><i
+                                    class="fa-solid fa-edit text-warning"></i></a>
+                            <a href="javascript:void(0)" onclick="deleteRow(this)" class="btn btn-white btn-sm border">
+                                <i class="fa-solid fa-trash text-danger"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-center">
+        <nav th:if="${totalPages > 0}">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link border-0 shadow-sm mx-1 rounded"
+                       th:href="@{/computers(keyword=${keyword}, page=${currentPage - 1})}">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </a>
+                </li>
+
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link border-0 shadow-sm mx-1 rounded"
+                       th:href="@{/computers(keyword=${keyword}, page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link border-0 shadow-sm mx-1 rounded"
+                       th:href="@{/computers(keyword=${keyword}, page=${currentPage + 1})}">
+                        <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    function deleteRow(btn) {
+        if (confirm('Bạn có chắc chắn muốn xóa máy tính này không?')) {
+            const row = btn.closest('tr');
+
+            if (row) {
+                row.remove();
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

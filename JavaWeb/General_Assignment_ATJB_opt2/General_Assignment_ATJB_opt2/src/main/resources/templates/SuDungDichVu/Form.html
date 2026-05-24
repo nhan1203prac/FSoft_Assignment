@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+<head>
+    <title>Đăng ký sử dụng dịch vụ</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/services" class="text-decoration-none">Quản lý dịch vụ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Đăng ký sử dụng</li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold text-dark">ĐĂNG KÝ SỬ DỤNG DỊCH VỤ</h3>
+    </div>
+
+    <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+        <span th:text="${errorMsg}">Nội dung lỗi cụ thể</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <span th:text="${successMsg}">Thành công!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div id="jsErrorBlock" class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-3 d-none" role="alert">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
+        <span id="jsErrorMsg">Lỗi nhập liệu phía giao diện...</span>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form id="serviceUsageForm" th:action="@{/service-usage/save}" th:object="${serviceUsage}" method="post" onsubmit="return validateFormJS()">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Khách hàng sử dụng <span class="text-danger">*</span></label>
+                        <select id="selectCustomer" th:field="*{khachHang.maKH}" class="form-select">
+                            <option value="">-- Chọn khách hàng --</option>
+                            <option th:each="c : ${customers}"
+                                    th:value="${c.maKH}"
+                                    th:text="|${c.maKH} - ${c.tenKH}|"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Dịch vụ cung cấp <span class="text-danger">*</span></label>
+                        <select id="selectService" th:field="*{dichVu.maDV}" class="form-select">
+                            <option value="">-- Chọn dịch vụ --</option>
+                            <option th:each="s : ${services}"
+                                    th:value="${s.maDV}"
+                                    th:text="|${s.maDV} - ${s.tenDV} (${#numbers.formatDecimal(s.donGia, 0, 'COMMA', 0, 'POINT')} Đ)|"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Ngày sử dụng dịch vụ <span class="text-danger">*</span></label>
+                        <input type="date" id="inputDate" th:field="*{id.ngaySuDung}" class="form-control">
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold">Giờ sử dụng (HH:mm) <span class="text-danger">*</span></label>
+                        <input type="text" id="inputTime" th:field="*{id.gioSuDung}" class="form-control" placeholder="Ví dụ: 14:30">
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold">Số lượng mua <span class="text-danger">*</span></label>
+                        <input type="number" id="inputQuantity" th:field="*{soLuong}" class="form-control" placeholder="0">
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/services" class="btn btn-light px-4 border">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Đăng ký dịch vụ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="scripts">
+    function validateFormJS() {
+        const customer = document.getElementById("selectCustomer").value;
+        const service = document.getElementById("selectService").value;
+        const dateVal = document.getElementById("inputDate").value;
+        const timeVal = document.getElementById("inputTime").value.trim();
+        const quantityVal = document.getElementById("inputQuantity").value;
+
+        const errorBlock = document.getElementById("jsErrorBlock");
+        const errorMsg = document.getElementById("jsErrorMsg");
+
+        console.log("validate chay")
+        function showFieldError(text) {
+            errorMsg.innerText = text;
+            errorBlock.classList.remove("d-none");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        if (!customer) {
+            showFieldError("Vui lòng lựa chọn một khách hàng từ danh sách!");
+            return false;
+        }
+        if (!service) {
+            showFieldError("Vui lòng lựa chọn một loại dịch vụ từ danh sách!");
+            return false;
+        }
+
+        if (!dateVal) {
+            showFieldError("Vui lòng chọn ngày sử dụng dịch vụ!");
+            return false;
+        }
+
+        const time24hRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!timeVal) {
+            showFieldError("Vui lòng nhập giờ bắt đầu sử dụng dịch vụ!");
+            return false;
+        }
+        if (!time24hRegex.test(timeVal)) {
+            showFieldError("Giờ sử dụng không đúng định dạng 24h! Định dạng chuẩn phải là HH:mm (Ví dụ: 08:30, 22:15).");
+            return false;
+        }
+
+        const quantityInt = parseInt(quantityVal);
+        if (!quantityVal || isNaN(quantityInt) || quantityInt <= 0) {
+            showFieldError("Số lượng mua dịch vụ phải là một số nguyên dương lớn hơn 0!");
+            return false;
+        }
+
+        errorBlock.classList.add("d-none");
+        return true;
+    }
+</script>
+
+</body>
+</html>
